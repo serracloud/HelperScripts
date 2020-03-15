@@ -22,7 +22,6 @@ def simple_get(url):
         log_error('Error during requests to {0} : {1}'.format(url, str(e)))
         return None
 
-
 def is_good_response(resp):
     """
     Returns True if the response seems to be HTML, False otherwise.
@@ -32,7 +31,6 @@ def is_good_response(resp):
             and content_type is not None 
             and content_type.find('html') > -1)
 
-
 def log_error(e):
     """
     It is always a good idea to log errors. 
@@ -40,7 +38,6 @@ def log_error(e):
     make it do anything.
     """
     print(e)
-
 
 def group_scrape(grpNum, dataCategory):
     raw_html = simple_get('https://attack.mitre.org/groups/'+grpNum+'/')
@@ -53,45 +50,54 @@ def group_scrape(grpNum, dataCategory):
         swList = html.body.findAll(text=re.compile('S\d\d\d'))
         return swList
 
-def stockpile_search(techList):
-    pathStart = '/root/caldera/plugins/stockpile/data/abilities/'
-    source_tech_ymls = []
-    grep = "grep attack_id "
-    cut = "|cut -d \":\" -f 2 | cut -d " " -f 2"
-    for subfolder, dir, files in os.walk(pathStart):
-        for ymlfile in files:
-            curPath = subfolder+'/'+ymlfile
-            file = open(curPath, "r")
-#            search = os.system(grep + curPath)
-            search = re.findall("T/d/d/d/d", file) 
-            print("value @ search var: ", search)
-            print("search var type: ", type(search))
-            if search in techList:
-                source_tech_ymls.append(ymlfile)
-                print("WINNERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
-            else:
-                print('Something went wrong! Check line 60')
-                print(ymlfile)
-            file.close()
-
-
 def write_file(techlist):
     file = open("groupdump.txt", "w")
     for item in techlist:
         file.write(item+'\n')
     file.close()
-    
-def line_search(filename, matchString):
-    file = open(filename, "r")
-    file.read()
-        
-        if re.findall(matchString, filename) in line:
-            return filename
-        else:
-            return 1
-    file.close()
 
+def tech_compare(file1, file2):
+	#Takes the target group file as file 1 and compares with a given file (file2) to see if a known tech ID is present in a yml.
+	f1 = open(file1, "r")
+	f2 = open(file2, "r")
+	#To compare line-by-line, we'll read the line content files prior to comparison. 
+	f1Data = f1.readlines()
+	f2Data = f2.readlines()
+	for techNum in f1Data:
+		for line in f2Data:
+			if techNum in line:
+				#We only need to see if the techNum is in the file. If so, we grab the file name.				
+				f1.close()
+				f2.close()
+				return file2
+			else:
+				continue
+	f1.close()
+	f2.close()
+	return 1
 
-#Use below to dump your scrape to a txt file
-#write_file(group_scrape('G0010','T'))
-stockpile_search("groupdump.txt")
+def stockpile_search(techList):
+	#Compares stockpiled abilities with a group's tech numbers. 
+	pathStart = '/root/caldera/plugins/stockpile/data/abilities/'
+	sourceTechYMLs = []
+	techPattern = (r"T\d\d\d\d")
+	#beginning recursive yml search
+	for subfolder, dir, files in os.walk(pathStart):
+		for ymlfile in files:
+			curPath = subfolder+'/'+ymlfile
+			techMatch = tech_compare(techList, curPath)
+			#(if crawled yml has mathing technique as source group list):
+			if techMatch is not 1:
+				sourceTechYMLs.append(ymlfile)	
+			else:
+				continue		
+	if len(sourceTechYMLs) <= 0:
+		#if loop breaks and returns an empty list, return error code 1
+		return 1
+	else:
+		#success returns list object with any ymls matching the core list. ymls in list will be not include full path.  
+		sourceTechIDs = []
+		for yml in sourceTechYMLs:
+			ID = yml.replace('.yml', '')
+			sourceTechIDs.append(ID)
+		return sourceTechIDs
