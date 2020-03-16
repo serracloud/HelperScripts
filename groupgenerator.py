@@ -4,7 +4,7 @@ from contextlib import closing
 from bs4 import BeautifulSoup
 import re
 import os
-
+import yaml
 
 def simple_get(url):
     """
