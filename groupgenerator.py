@@ -118,3 +118,25 @@ def adv_yml_locate(advName):
 					return ymlfile.replace(".yml", ""), curPath
 	#If all loops do not return any results, return with error code 1
 	return 1
+
+
+
+"""==================================================================================
+		      Beware: shitty code above|Workspace Below
+   =================================================================================="""
+
+def update_yml(ymlfile, abilityList):
+	with open(ymlfile, 'r') as f:
+		loadThis = yaml.safe_load(f)
+		phaseDict =loadThis['phases']
+		#Fix the abilityList output into yml
+		phaseDict[1] = abilityList
+
+	with open(ymlfile, 'w') as f:
+		yaml.dump(loadThis, f)
+
+curTree = {'1': ['b007fe0c-c6b0-4fda-915c-255bbc070de2']}
+ymlpath = '/root/caldera/data/adversaries/5a26bc2f-8b64-4212-b2a7-fa0bf4f2a984.yml'
+update_yml(ymlpath, stockpile_search("groupdump.txt"))
+
+
