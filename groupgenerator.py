@@ -79,6 +79,8 @@ def tech_compare(file1, file2):
 def stockpile_search(techList):
 	#Compares stockpiled abilities with a group's tech numbers. 
 	pathStart = '/root/caldera/plugins/stockpile/data/abilities/'
+	#alternate path/change alternate to appropriate path name
+	#pathStart = '/root/caldera/plugins/alternate/data/abilities'
 	sourceTechYMLs = []
 	techPattern = (r"T\d\d\d\d")
 	#beginning recursive yml search
