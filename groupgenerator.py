@@ -101,3 +101,18 @@ def stockpile_search(techList):
 			ID = yml.replace('.yml', '')
 			sourceTechIDs.append(ID)
 		return sourceTechIDs
+
+def adv_yml_locate(advName):
+	pathStart = "/root/caldera/"
+	for subfolder, dir, files in os.walk(pathStart):
+		for ymlfile in files:
+			curPath = subfolder+'/'+ymlfile			
+			if ".yml" not in ymlfile:
+				break
+			curFile = open(curPath, "r")
+			curData = curFile.readlines()
+			for line in curData:
+				if advName in line:
+					return ymlfile.replace(".yml", ""), curPath
+	#If all loops do not return any results, return with error code 1
+	return 1
